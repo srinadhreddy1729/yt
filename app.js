@@ -5,7 +5,11 @@ const dotenv=require('dotenv')
 const mongoose=require('mongoose')
 const routes=require('./src/routes/allroutes')
 const app=express();
-app.use(cors())
+app.use(cors(
+    {
+        origin:"*"
+    }
+))
 app.use(express.json())
 dotenv.config()
 app.set('view engine','ejs')
