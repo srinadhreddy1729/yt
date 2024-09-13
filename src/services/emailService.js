@@ -43,7 +43,7 @@ const sendOtp = async (request, response) => {
         if (!userData) {
             userData = new UserData({
                 userEmail: userEmail,
-                userOtp: OTPNumber,  //C:\Users\HP\Downloads\NewIon\NewIon\myApp\android\app\build\outputs\apk\debug
+                userOtp: OTPNumber,  
                 otpExpiry: OTPExpiry
             });
         }
@@ -59,34 +59,34 @@ const sendOtp = async (request, response) => {
         response.status(404).json({ message: error.message })
     }
     try {
-        // let template;
-        // const templatePath = path.resolve('C:\\Users\\HP\\Desktop\\dosthi_application_backend\\views\\email.ejs'); 
-    //     try
-    //     {
+        let template;
+        const templatePath = path.resolve('C:\\Users\\HP\\Desktop\\dosthi_application_backend\\views\\email.ejs'); 
+        try
+        {
         
-    //     if (!fs.existsSync(templatePath)) {
-    //         throw new Error(`Template file not found at ${templatePath}`);
-    //     }
-    //      template = fs.readFileSync(templatePath, 'utf-8');
+        if (!fs.existsSync(templatePath)) {
+            throw new Error(`Template file not found at ${templatePath}`);
+        }
+         template = fs.readFileSync(templatePath, 'utf-8');
 
-    // }
-    // catch(error)
-    // {
-    //   response.json({message:error.message})
-    // }
+    }
+    catch(error)
+    {
+      response.json({message:error.message})
+    }
 
         
-    //   const email=ejs.render(template,
-    //               {  
-    //         userName:`${userEmail}`,
-    //         otpCode:`${OTPNumber}`
-    //               });
+      const email=ejs.render(template,
+                  {  
+            userName:`${userEmail}`,
+            otpCode:`${OTPNumber}`
+                  });
         const options = {
             to: `${userEmail}`,
             from: 'kiran124teja@gmail.com',
             subject: 'otp verification code',
             text: `opt sent`,
-            html: `<h1>${OTPNumber}</h1>`
+            html:email
         }
         await mailTrans.sendMail(options)
         response.status(200).json({ message: "email sent successfully..." })
