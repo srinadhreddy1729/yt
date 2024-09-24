@@ -1,10 +1,10 @@
-
+const NodeCache = require('node-cache'); // added
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
 const socketIo = require('socket.io');
-const User = require('./src/models/User');
+// const User = require('./src/models/User');
 const authRoutes = require('./src/routes/auth');
 const profileRoutes = require('./src/routes/profiles');
 const routes = require('./src/routes/allroutes');
@@ -21,9 +21,12 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/DosthiApplicationDatabase", { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log("Database connected"))
-    .catch(err => console.error("Database connection error:", err));
+
+
+
+// mongoose.connect("mongodb://127.0.0.1:27017/DosthiApplicationDatabase", { useNewUrlParser: true, useUnifiedTopology: true })
+//     .then(() => console.log("Database connected"))
+//     .catch(err => console.error("Database connection error:", err));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);

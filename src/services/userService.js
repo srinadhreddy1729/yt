@@ -1,7 +1,8 @@
 const userModel = require('../models/User')
 
 const sendUserDetails = async (request, response) => {
-    const {profile,
+    const {email,
+        profile,
         nickname,
         gender,
         dateofbirth } = request.body
@@ -11,6 +12,7 @@ const sendUserDetails = async (request, response) => {
             }
         else{
     const user = new userModel({
+        email:email,
         profile:   profile,
         nickname: nickname,
         gender: gender,

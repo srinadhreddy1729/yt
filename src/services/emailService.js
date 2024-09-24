@@ -1,19 +1,21 @@
+
 const nodeMailer = require('nodemailer')
 const crypto = require('crypto')
 const fs=require('fs')
-const UserData = require('../models/UserDetailsModel')
+// const UserData = require('../models/UserDetailsModel')
 const path=require('path')
 const ejs=require('ejs')
+
 const generateOTP = () => {
     return new Promise((reslove, reject) => {
         crypto.randomInt(1000, 10000, (error, success) => {
             if (success) reslove(success);
             else reject(error)
         });
-
     }
-    )
+ )
 }
+
 
 const mailTrans = nodeMailer.createTransport(
     {
@@ -29,9 +31,9 @@ const mailTrans = nodeMailer.createTransport(
 
 const sendOtp = async (request, response) => {
     const { userEmail } = request.body
-
     let OTPNumber;
     let OTPExpiry;
+
     if (!userEmail) {
         return response.status(404).json({ message: 'Email is required' });
     }
@@ -39,7 +41,7 @@ const sendOtp = async (request, response) => {
         OTPNumber = await generateOTP();
         OTPExpiry = (Date.now() + 10 * 60 * 1000).toString()
 
-        let userData = await UserData.findOne({ userEmail });
+        // let userData = await UserData.findOne({ userEmail });
         if (!userData) {
             userData = new UserData({
                 userEmail: userEmail,
@@ -53,14 +55,14 @@ const sendOtp = async (request, response) => {
             userData.otpExpiry = OTPExpiry;
 
         }
-        await userData.save();
+        // await userData.save();
     }
     catch (error) {
         response.status(404).json({ message: error.message })
     }
     try {
         let template;
-        const templatePath = path.resolve('C:\\Users\\HP\\Desktop\\dosthi_application_backend\\views\\email.ejs'); 
+        const templatePath = path.resolve('C:\\Users\\KIRAN\\Desktop\\dosthi-backend\\views\\email.ejs'); 
         try
         {
         
@@ -74,8 +76,6 @@ const sendOtp = async (request, response) => {
     {
       response.json({message:error.message})
     }
-
-        
       const email=ejs.render(template,
                   {  
             userName:`${userEmail}`,
@@ -89,7 +89,7 @@ const sendOtp = async (request, response) => {
             html:email
         }
         await mailTrans.sendMail(options)
-        response.status(200).json({ message: "email sent successfully..." })
+        response.status(200).json({ message: "email sent successfully...", code:OTPNumber})
 
     }
     catch (error) {
@@ -101,18 +101,18 @@ const sendOtp = async (request, response) => {
 
 const verifyOTP = async (request, response) => {
     const { userOtp } = request.body
-    const userData = await UserData.findOne({ userOtp });
+    // const userData = await UserData.findOne({ userOtp });
     if (!userOtp) {
         return response.status(400).json({ message: "OTP is required" })
     }
     try {
+       
         if (!userData) {
             return response.status(400).json({ message: "Invalid  OTP" })
 
         }
         else if (Date.now() > Number(userData.otpExpiry) || userData.userOtp !== String(userOtp)) {
             return response.status(400).json({ message: 'expired OTP' });
-
         }
 
         userData.userOtp = null;

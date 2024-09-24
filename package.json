@@ -1,7 +1,7 @@
 {
-  "name": "dosthi_application_backend_production",
+  "name": "dosthi-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "<<<<<<< HEAD\r 2024@ dosthi application \r =======\r # dosthi_application_backend\r >>>>>>> origin/main",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,17 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
-    "env": "^0.0.2",
-    "express": "^4.20.0",
+    "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.6.1",
-    "nodemailer": "^6.9.14",
-    "nodemon": "^3.1.4",
-    "socket.io": "^4.7.5",
-    "uuid": "^10.0.0"
+    "mongoose": "^8.6.3",
+    "node-cache": "^5.1.2",
+    "nodemailer": "^6.9.15",
+    "nodemon": "^3.1.7"
   }
 }
