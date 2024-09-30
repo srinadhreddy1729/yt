@@ -1,134 +1,173 @@
-
-const nodeMailer = require('nodemailer')
+const nodemailer = require('nodemailer')
+const fs = require('fs')
+const ejs = require('ejs')
+const path = require('path')
 const crypto = require('crypto')
-const fs=require('fs')
-// const UserData = require('../models/UserDetailsModel')
-const path=require('path')
-const ejs=require('ejs')
-
+const UserData=require('../models/OTP')
+const transport = nodemailer.createTransport({
+    secure: true,
+    service: 'gmail',
+    auth: {
+        pass: 'yahc uuoc vqoi xlzv',
+        user: "kiran124teja@gmail.com"
+    }
+});
 const generateOTP = () => {
     return new Promise((reslove, reject) => {
-        crypto.randomInt(1000, 10000, (error, success) => {
-            if (success) reslove(success);
-            else reject(error)
-        });
-    }
- )
+        crypto.randomInt(1000, 10000, (error,response) => {
+            if (error) reject(error);
+            else reslove(response)
+
+        })
+
+    });
 }
 
+// const sendEmail = async (request, response) => {
+//     console.log("callled........")
+//     let template;
+//     const { email } = request.body;
+//     let OTPNumber;
 
-const mailTrans = nodeMailer.createTransport(
-    {
-        secure: true,
-        service: 'gmail',
-        auth: {
-            pass: 'yahc uuoc vqoi xlzv',
-            user: "kiran124teja@gmail.com"
+//     try {
+     
+//      OTPNumber=await generateOTP()
 
-        }
-    }
-)
+//         const filePath = path.resolve('C://Users//HP//Downloads//dosthi-backend//dosthi-backend//views//email.ejs')
+//         if (!fs.existsSync(filePath)) {
+//             return response.status(404).json({ message: 'file not found' })
+//         }
+//         if (!request.body) {
+//             return response.status(401).json({ mesasge: 'invalid body' });
+//         }
+//         else if (request.body) {
 
-const sendOtp = async (request, response) => {
-    const { userEmail } = request.body
+
+            
+//             template = fs.readFileSync(filePath, 'utf-8')
+//             const file = ejs.render(template, {email:email,OTP:OTPNumber })
+//             const options = {
+//                 from: 'kiran124teja@gmail.com',
+//                 to: `${email}`,
+//                 subject: 'here is your opt',
+//                 text: 'data',
+//                 html: file
+//             }
+
+//             await transport.sendMail(options);
+//             return response.status(201).json({ message: "mail sent successfully" });
+
+//         }
+//     }
+//     catch (error) {
+//         return response.status(404).json({ error: error.message })
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+const sendEmail = async (request, response) => {
+    const { email } = request.body
     let OTPNumber;
     let OTPExpiry;
-
-    if (!userEmail) {
+    if (!email) {
         return response.status(404).json({ message: 'Email is required' });
     }
     try {
         OTPNumber = await generateOTP();
         OTPExpiry = (Date.now() + 10 * 60 * 1000).toString()
 
-        // let userData = await UserData.findOne({ userEmail });
+        let userData = await UserData.findOne({ email });
         if (!userData) {
             userData = new UserData({
-                userEmail: userEmail,
-                userOtp: OTPNumber,  
+                userEmail: email,
+                userOtp: OTPNumber,
                 otpExpiry: OTPExpiry
             });
         }
         else {
-            userData.userEmail = userEmail;
+            userData.userEmail =email;
             userData.userOtp = OTPNumber;
             userData.otpExpiry = OTPExpiry;
 
         }
-        // await userData.save();
+        await userData.save();
     }
     catch (error) {
-        response.status(404).json({ message: error.message })
+        return response.status(404).json({ message: error.message })
     }
     try {
         let template;
-        const templatePath = path.resolve('C:\\Users\\KIRAN\\Desktop\\dosthi-backend\\views\\email.ejs'); 
-        try
-        {
-        
-        if (!fs.existsSync(templatePath)) {
-            throw new Error(`Template file not found at ${templatePath}`);
-        }
-         template = fs.readFileSync(templatePath, 'utf-8');
+        const templatePath = path.resolve('C:\\Users\\HP\\Desktop\\dosthi_application_backend\\views\\email.ejs');
+        try {
 
-    }
-    catch(error)
-    {
-      response.json({message:error.message})
-    }
-      const email=ejs.render(template,
-                  {  
-            userName:`${userEmail}`,
-            otpCode:`${OTPNumber}`
-                  });
+            if (!fs.existsSync(templatePath)) {
+                throw new Error(`Template file not found at ${templatePath}`);
+            }
+            template = fs.readFileSync(templatePath, 'utf-8');
+
+        }
+        catch (error) {
+           return response.json({ message: error.message })
+        }
+
+
+        const emailPath= ejs.render(template,
+            {
+                userName: `${email}`,
+                otpCode: `${OTPNumber}`
+            });
         const options = {
-            to: `${userEmail}`,
+            to: `${email}`,
             from: 'kiran124teja@gmail.com',
             subject: 'otp verification code',
             text: `opt sent`,
-            html:email
+            html: emailPath
         }
-        await mailTrans.sendMail(options)
-        response.status(200).json({ message: "email sent successfully...", code:OTPNumber})
+        await transport.sendMail(options)
+        return response.status(200).json({ message: "email sent successfully...",status:200})
 
     }
     catch (error) {
         console.log(error.message)
-        response.status(500).json({ message: "Internal Server Error" })
+        return response.status(500).json({ message: "Internal Server Error" })
     }
 
 }
 
 const verifyOTP = async (request, response) => {
     const { userOtp } = request.body
-    // const userData = await UserData.findOne({ userOtp });
+    const userData = await UserData.findOne({ userOtp });
     if (!userOtp) {
         return response.status(400).json({ message: "OTP is required" })
     }
     try {
-       
         if (!userData) {
             return response.status(400).json({ message: "Invalid  OTP" })
 
         }
         else if (Date.now() > Number(userData.otpExpiry) || userData.userOtp !== String(userOtp)) {
             return response.status(400).json({ message: 'expired OTP' });
+
         }
 
         userData.userOtp = null;
         userData.otpExpiry = null;
         await userData.save();
-        response.status(200).json({ message: 'OTP verified successfully' });
+        return response.status(200).json({ message: 'OTP verified successfully' });
     }
     catch (error) {
-        response.status(401).json({ message: error.message })
+        return response.status(401).json({ message: error.message })
     }
 
 }
-const example=async (request,response)=>
-    {
-    response.json({message:"its running successfully..........."})
-    }
 
 
-module.exports = { sendOtp, verifyOTP,example }
+module.exports = { sendEmail, verifyOTP}
