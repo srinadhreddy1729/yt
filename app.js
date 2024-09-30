@@ -4,11 +4,9 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
+const bodyParser=require('body-parser')
 const ejs = require('ejs');
 const User = require('./src/models/User'); 
-dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {

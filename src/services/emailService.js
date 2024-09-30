@@ -99,37 +99,34 @@ const sendEmail = async (request, response) => {
 
         }
         await userData.save();
-    }
-    catch (error) {
-        return response.status(404).json({ message: error.message })
-    }
-    try {
+   
+    
         let template;
-        const templatePath = path.resolve('C:\\Users\\HP\\Desktop\\dosthi_application_backend\\views\\email.ejs');
-        try {
+        // const templatePath = path.resolve('C:\\Users\\HP\\Desktop\\dosthi_application_backend\\views\\email.ejs');
+        // try {
 
-            if (!fs.existsSync(templatePath)) {
-                throw new Error(`Template file not found at ${templatePath}`);
-            }
-            template = fs.readFileSync(templatePath, 'utf-8');
+        //     if (!fs.existsSync(templatePath)) {
+        //         throw new Error(`Template file not found at ${templatePath}`);
+        //     }
+        //     // template = fs.readFileSync(templatePath, 'utf-8');
 
-        }
-        catch (error) {
-           return response.json({ message: error.message })
-        }
+        // }
+        // catch (error) {
+        //    return response.json({ message: error.message })
+        // }
 
 
-        const emailPath= ejs.render(template,
-            {
-                userName: `${email}`,
-                otpCode: `${OTPNumber}`
-            });
+        // const emailPath= ejs.render(template,
+        //     {
+        //         userName: `${email}`,
+        //         otpCode: `${OTPNumber}`
+        //     });
         const options = {
             to: `${email}`,
             from: 'kiran124teja@gmail.com',
             subject: 'otp verification code',
             text: `opt sent`,
-            html: emailPath
+            html:`<h1>${OTPNumber}</h1>`
         }
         await transport.sendMail(options)
         return response.status(200).json({ message: "email sent successfully...",status:200})
